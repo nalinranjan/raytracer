@@ -171,7 +171,7 @@ bool Camera::inShadow(const Ray& shadow_ray, const std::vector<Object *>& object
     for (auto& obj : objects)
     {
         // float w = obj->intersect(shadow_ray);
-        if (obj->intersect(shadow_ray) > 0.035)
+        if (obj->intersect(shadow_ray) > 0.9)
         // if (w > 0.1)
         {
             // Vector3f int_pt = shadow_ray.origin + w*shadow_ray.direction;

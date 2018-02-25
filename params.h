@@ -89,9 +89,15 @@ namespace params
     {
         const Vector3f color(1.0, 1.0, 1.0);
         const Vector3f position(-1.3, 9.0, 10.0);
-        const Vector3f ambient(0.4, 0.4, 0.4);
+        const Vector3f ambient(0.2, 0.2, 0.2);
     }
 
+    namespace light2
+    {
+        const Vector3f color(1.0, 1.0, 1.0);
+        const Vector3f position(5.3, 3.0, 6.0);
+        const Vector3f ambient(0.2, 0.2, 0.2);
+    }
 }
 
 #endif

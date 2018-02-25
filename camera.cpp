@@ -59,6 +59,7 @@ void Camera::render(const World& world)
     auto lights = world.getLights();
 
     transformObjects(objects);
+    transformLights(lights);
     
     float pixel_width = params::view_width / params::img_width;
     float pixel_height = params::view_height / params::img_height;
@@ -99,6 +100,19 @@ void Camera::transformObjects(const std::vector<Object *>& objects) const
     std::cout << "Object transformation: " << elapsed.count() << std::endl;
 }
 
+void Camera::transformLights(const std::vector<Light *>& lights) const
+{
+    auto start = std::chrono::high_resolution_clock::now();
+    for (auto& light : lights)
+    {
+        light->transform(viewTransform);
+    }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto elapsed = end - start;
+    std::cout << "Light transformation: " << elapsed.count() << std::endl;
+}
+
 void Camera::illuminatePixel(int i, int j, float pixel_width, float pixel_height, const std::vector<Object *>& objects, const std::vector<Light *>& lights)
 {
     Vector3f direction(-1*params::view_width/2 + (i-0.5)*pixel_width,
@@ -122,7 +136,7 @@ void Camera::illuminatePixel(int i, int j, float pixel_width, float pixel_height
         }
     }
 
-    if (hit_object)
+    if (hit_object != NULL)
     {
         Vector3f intersection_pt = ray.origin + min_w*ray.direction;
         for (auto& light : lights)

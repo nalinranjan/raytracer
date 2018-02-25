@@ -28,6 +28,7 @@ public:
     void render(const World&);
     // void transformObjects(const World&) const;
     void transformObjects(const std::vector<Object *>& objects) const;
+    void transformLights(const std::vector<Light *>& lights) const;
     // void illuminatePixel(int, int, float, float, const World&);
     void illuminatePixel(int, int, float, float, const std::vector<Object *>&, const std::vector<Light *>&);
     // void illuminatePixel(int, int, float, float, const std::vector<Object *>& objects);

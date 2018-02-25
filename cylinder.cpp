@@ -65,8 +65,7 @@ float Cylinder::intersect(const Ray& ray) const
     return -1;
 }
 
-// Vector3f Cylinder::getColor() const
-// {
-//     Vector3f color(0.5, 0.5, 0.0);
-//     return color;
-// }
+Vector3f Cylinder::getPos() const
+{
+    return centers[0];
+}

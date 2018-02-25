@@ -21,7 +21,7 @@ public:
     virtual float intersect(const Ray&) const = 0;
     virtual void transform(const Matrix4f&) = 0;
     virtual Vector3f getNormal(const Vector3f&) const = 0;
-    // virtual Vector3f getPos() const = 0;
+    virtual Vector3f getPos() const = 0;
 
 protected:
     const IlluminationModel *material;

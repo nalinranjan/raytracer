@@ -59,7 +59,9 @@ void Camera::render(const World& world)
     auto lights = world.getLights();
 
     transformObjects(objects);
+    // std::cout << lights[0]->position << std::endl;
     transformLights(lights);
+    // std::cout << lights[0]->position << std::endl;
     
     float pixel_width = params::view_width / params::img_width;
     float pixel_height = params::view_height / params::img_height;
@@ -93,6 +95,7 @@ void Camera::transformObjects(const std::vector<Object *>& objects) const
     for (auto& obj : objects)
     {
         obj->transform(viewTransform);
+        // std::cout << obj->getName() << std::endl << obj->getPos() << std::endl;
     }
 
     auto end = std::chrono::high_resolution_clock::now();
@@ -142,6 +145,7 @@ void Camera::illuminatePixel(int i, int j, float pixel_width, float pixel_height
         for (auto& light : lights)
         {
             Vector3f light_direction = light->position - intersection_pt;
+            light_direction.normalize();
             if (inShadow(Ray(intersection_pt, light_direction), objects))
             {
                 std::cout << hit_object->getName() << " in shadow at " << i << ", " << j << std::endl;
@@ -166,12 +170,16 @@ bool Camera::inShadow(const Ray& shadow_ray, const std::vector<Object *>& object
 {
     for (auto& obj : objects)
     {
-        if (obj->intersect(shadow_ray) > 0.1)
+        float w = obj->intersect(shadow_ray);
+        // if (obj->intersect(shadow_ray) > 0.3)
+        if (w > 0.1)
         {
+            Vector3f int_pt = shadow_ray.origin + w*shadow_ray.direction;
             std::cout << obj->getName() << " intersected by (" << shadow_ray.origin.x() 
                       << ", " << shadow_ray.origin.y() << ", " << shadow_ray.origin.z()
                       << ")->(" << shadow_ray.direction.x() << ", " << shadow_ray.direction.y()
-                      << ", " << shadow_ray.direction.z() << ")\t"; 
+                      << ", " << shadow_ray.direction.z() << ") at w = " << w << " (" << int_pt.x() << ", " 
+                      << int_pt.y() << ", " << int_pt.z() << ")\t"; 
             return true;
         }
     }

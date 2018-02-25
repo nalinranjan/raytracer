@@ -60,8 +60,8 @@ Vector3f Triangle::getNormal(const Vector3f&) const
     normal.normalize();
     return normal;
 }
-// Vector3f Triangle::getColor() const
-// {
-//     Vector3f color(1.0, 0.0, 0.0);
-//     return color;
-// }
+
+Vector3f Triangle::getPos() const
+{
+    return vertices[0];
+}

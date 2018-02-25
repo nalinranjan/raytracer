@@ -14,6 +14,7 @@ public:
     Cylinder(const Vector3f&, const Vector3f&, float, const IlluminationModel&, const std::string&);
     void transform(const Matrix4f&);
     float intersect(const Ray&) const;
+    Vector3f getPos() const;
     // Vector3f getColor(const IntersectVectors&, const Light&) const;
     // Vector3f getAmbient(const Light&) const;
 

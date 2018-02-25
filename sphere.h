@@ -17,7 +17,7 @@ public:
     Vector3f getNormal(const Vector3f&) const;
     // Vector3f getColor(const IntersectVectors&, const Light&) const;
     // Vector3f getAmbient(const Light&) const;
-    // Vector3f getPos() const;
+    Vector3f getPos() const;
 
 private:
     Vector3f center;

@@ -62,7 +62,7 @@ Vector3f Sphere::getNormal(const Vector3f& intersection_pt) const
 //     return model->getAmbient(light);
 // }
 
-// Vector3f Sphere::getPos() const
-// {
-//     return center;
-// }
+Vector3f Sphere::getPos() const
+{
+    return center;
+}

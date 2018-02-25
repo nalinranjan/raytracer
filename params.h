@@ -95,9 +95,11 @@ namespace params
     namespace light2
     {
         const Vector3f color(1.0, 1.0, 1.0);
-        const Vector3f position(5.3, 3.0, 6.0);
+        const Vector3f position(5.3, 3.0, 8.0);
         const Vector3f ambient(0.2, 0.2, 0.2);
     }
+
+    const int supersample = 1;
 }
 
 #endif

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <chrono>
+#include <random>
 #include "camera.h"
 
 Camera::Camera():
@@ -118,51 +119,63 @@ void Camera::transformLights(const std::vector<Light *>& lights) const
 
 void Camera::illuminatePixel(int i, int j, float pixel_width, float pixel_height, const std::vector<Object *>& objects, const std::vector<Light *>& lights)
 {
-    Vector3f direction(-1*params::view_width/2 + (i-0.5)*pixel_width,
-                       -1*params::view_height/2 + (j-0.5)*pixel_height,
-                       -params::f);
-    direction.normalize();
-
-    Ray ray(Vector3f::Zero(), direction);
-
+    static std::default_random_engine e;
+    static std::uniform_real_distribution<> rand(0, 1);
     Vector3f c = Vector3f::Zero();
-    float min_w = std::numeric_limits<float>::max();
-    const Object * hit_object = NULL;
 
-    for (auto& obj : objects)
+    for (int k = 0; k < params::supersample; ++k)
     {
-        float w = obj->intersect(ray);
-        if (w > 0 && w < min_w)
+        float rand_x = rand(e);
+        float rand_y = rand(e);
+
+        // std::cout << rand_x << " " << rand_y << std::endl;
+
+        Vector3f direction(-1*params::view_width/2 + (i-rand_x)*pixel_width,
+                           -1*params::view_height/2 + (j-rand_y)*pixel_height,
+                           -params::f);
+        direction.normalize();
+
+        Ray ray(Vector3f::Zero(), direction);
+
+        float min_w = std::numeric_limits<float>::max();
+        const Object * hit_object = NULL;
+
+        for (auto& obj : objects)
         {
-            hit_object = obj;
-            min_w = w;
+            float w = obj->intersect(ray);
+            if (w > 0 && w < min_w)
+            {
+                hit_object = obj;
+                min_w = w;
+            }
+        }
+
+        if (hit_object != NULL)
+        {
+            Vector3f intersection_pt = ray.origin + min_w*ray.direction;
+            for (auto& light : lights)
+            {
+                Vector3f light_direction = light->position - intersection_pt;
+                light_direction.normalize();
+                if (inShadow(Ray(intersection_pt, light_direction), objects))
+                {
+                    // std::cout << hit_object->getName() << " in shadow at " << i << ", " << j << std::endl;
+                    c += hit_object->getAmbient(*light);
+                }
+                else
+                {
+                    Vector3f normal = hit_object->getNormal(intersection_pt);
+                    c += hit_object->getColor(getIV(intersection_pt, normal, light->position), *light);
+                }
+            }
+        }
+        else
+        {
+            c += params::img_background;
         }
     }
 
-    if (hit_object != NULL)
-    {
-        Vector3f intersection_pt = ray.origin + min_w*ray.direction;
-        for (auto& light : lights)
-        {
-            Vector3f light_direction = light->position - intersection_pt;
-            light_direction.normalize();
-            if (inShadow(Ray(intersection_pt, light_direction), objects))
-            {
-                // std::cout << hit_object->getName() << " in shadow at " << i << ", " << j << std::endl;
-                c += hit_object->getAmbient(*light);
-            }
-            else
-            {
-                Vector3f normal = hit_object->getNormal(intersection_pt);
-                c += hit_object->getColor(getIV(intersection_pt, normal, light->position), *light);
-            }
-        }
-    }
-    else
-    {
-        c = params::img_background;
-    }
-
+    c /= params::supersample;
     screenBuffer.at(j-1).at(i-1) = c;
 }
 

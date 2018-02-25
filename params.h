@@ -37,7 +37,7 @@ namespace params
         const Vector3f ka(1.0, 0.1, 0.1);
         const Vector3f kd(0.8, 0.1, 0.1);
         const Vector3f ks(1.0, 1.0, 1.0);
-        const float ke = 11.0;
+        const float ke = 15.0;
     }
 
     // Transmissive Sphere
@@ -48,7 +48,7 @@ namespace params
         const Vector3f ka(0.0, 0.0, 0.8);
         const Vector3f kd(0.0, 0.0, 0.8);
         const Vector3f ks(1.0, 1.0, 1.0);
-        const float ke = 9.0;
+        const float ke = 12.0;
     }
 
     // Floor
@@ -89,7 +89,7 @@ namespace params
     {
         const Vector3f color(1.0, 1.0, 1.0);
         const Vector3f position(-1.3, 9.0, 10.0);
-        const Vector3f ambient(0.2, 0.2, 0.2);
+        const Vector3f ambient(0.4, 0.4, 0.4);
     }
 
     namespace light2

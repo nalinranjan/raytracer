@@ -11,6 +11,7 @@
 #include "light.h"
 #include "illumination.h"
 #include "phong.h"
+#include "phongblinn.h"
 #include "params.h"
 
 using namespace Eigen;
@@ -40,10 +41,12 @@ int main(int argc, char const *argv[])
     //     params::cylinder::color, params::cylinder::center1, params::cylinder::center2, params::cylinder::radius
     // );
 
-    IlluminationModel * ref_sphere = new Phong(params::ref_sphere::ka, params::ref_sphere::kd, params::ref_sphere::ks, params::ref_sphere::ke);
+    // IlluminationModel * ref_sphere = new Phong(params::ref_sphere::ka, params::ref_sphere::kd, params::ref_sphere::ks, params::ref_sphere::ke);
+    IlluminationModel * ref_sphere = new PhongBlinn(params::ref_sphere::ka, params::ref_sphere::kd, params::ref_sphere::ks, params::ref_sphere::ke);
     Object * reflective = new Sphere(params::ref_sphere::center, params::ref_sphere::radius, *ref_sphere, "reflective");
 
-    IlluminationModel * trans_sphere = new Phong(params::trans_sphere::ka, params::trans_sphere::kd, params::trans_sphere::ks, params::trans_sphere::ke);
+    // IlluminationModel * trans_sphere = new Phong(params::trans_sphere::ka, params::trans_sphere::kd, params::trans_sphere::ks, params::trans_sphere::ke);
+    IlluminationModel * trans_sphere = new PhongBlinn(params::trans_sphere::ka, params::trans_sphere::kd, params::trans_sphere::ks, params::trans_sphere::ke);
     Object * transmissive = new Sphere(params::trans_sphere::center, params::trans_sphere::radius, *trans_sphere, "transmissive");
 
     IlluminationModel * floor = new Phong(params::floor_color::ka, params::floor_color::kd, params::floor_color::ks, params::floor_color::ke);
@@ -53,7 +56,7 @@ int main(int argc, char const *argv[])
     // Object * cylinder = new Cylinder(params::cylinder::color, params::cylinder::center1, params::cylinder::center2, params::cylinder::radius);
 
     Light * source1 = new Light(params::light1::color, params::light1::position, params::light1::ambient);
-    Light * source2 = new Light(params::light2::color, params::light2::position, params::light2::ambient);
+    // Light * source2 = new Light(params::light2::color, params::light2::position, params::light2::ambient);
 
     auto end = std::chrono::high_resolution_clock::now();
 
@@ -69,7 +72,7 @@ int main(int argc, char const *argv[])
     // world.addObject(cylinder);
 
     world.addLight(source1);
-    world.addLight(source2);
+    // world.addLight(source2);
 
     end = std::chrono::high_resolution_clock::now();
     elapsed = end - start;

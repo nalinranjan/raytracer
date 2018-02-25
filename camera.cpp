@@ -197,7 +197,8 @@ IntersectVectors Camera::getIV(const Vector3f& point, const Vector3f& normal, co
 
     Vector3f N = normal;
 
-    Vector3f H = Vector3f::Zero();
+    Vector3f H = V + S;
+    H.normalize();
 
     Vector3f R = reflect(-S, N);
     R.normalize();

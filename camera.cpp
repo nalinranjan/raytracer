@@ -125,8 +125,18 @@ void Camera::illuminatePixel(int i, int j, float pixel_width, float pixel_height
 
     for (int k = 0; k < params::supersample; ++k)
     {
-        float rand_x = rand(e);
-        float rand_y = rand(e);
+        float rand_x, rand_y;
+
+        if (params::supersample > 1)
+        {
+            rand_x = rand(e);
+            rand_y = rand(e);
+        }
+        else
+        {
+            rand_x = 0.5;
+            rand_y = 0.5;
+        }
 
         // std::cout << rand_x << " " << rand_y << std::endl;
 

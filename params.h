@@ -99,7 +99,7 @@ namespace params
         const Vector3f ambient(0.2, 0.2, 0.2);
     }
 
-    const int supersample = 1;
+    const int supersample = 16;
 }
 
 #endif

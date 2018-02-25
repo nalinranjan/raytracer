@@ -148,7 +148,7 @@ void Camera::illuminatePixel(int i, int j, float pixel_width, float pixel_height
             light_direction.normalize();
             if (inShadow(Ray(intersection_pt, light_direction), objects))
             {
-                std::cout << hit_object->getName() << " in shadow at " << i << ", " << j << std::endl;
+                // std::cout << hit_object->getName() << " in shadow at " << i << ", " << j << std::endl;
                 c += hit_object->getAmbient(*light);
             }
             else
@@ -170,16 +170,16 @@ bool Camera::inShadow(const Ray& shadow_ray, const std::vector<Object *>& object
 {
     for (auto& obj : objects)
     {
-        float w = obj->intersect(shadow_ray);
-        // if (obj->intersect(shadow_ray) > 0.3)
-        if (w > 0.1)
+        // float w = obj->intersect(shadow_ray);
+        if (obj->intersect(shadow_ray) > 0.035)
+        // if (w > 0.1)
         {
-            Vector3f int_pt = shadow_ray.origin + w*shadow_ray.direction;
-            std::cout << obj->getName() << " intersected by (" << shadow_ray.origin.x() 
-                      << ", " << shadow_ray.origin.y() << ", " << shadow_ray.origin.z()
-                      << ")->(" << shadow_ray.direction.x() << ", " << shadow_ray.direction.y()
-                      << ", " << shadow_ray.direction.z() << ") at w = " << w << " (" << int_pt.x() << ", " 
-                      << int_pt.y() << ", " << int_pt.z() << ")\t"; 
+            // Vector3f int_pt = shadow_ray.origin + w*shadow_ray.direction;
+            // std::cout << obj->getName() << " intersected by (" << shadow_ray.origin.x() 
+            //           << ", " << shadow_ray.origin.y() << ", " << shadow_ray.origin.z()
+            //           << ")->(" << shadow_ray.direction.x() << ", " << shadow_ray.direction.y()
+            //           << ", " << shadow_ray.direction.z() << ") at w = " << w << " (" << int_pt.x() << ", " 
+            //           << int_pt.y() << ", " << int_pt.z() << ")\t"; 
             return true;
         }
     }

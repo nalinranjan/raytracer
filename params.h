@@ -34,7 +34,7 @@ namespace params
     {
         const Vector3f center(-0.8, 1.3, 1.5);
         const float radius = 0.65;
-        const Vector3f ka(0.8, 0.1, 0.1);
+        const Vector3f ka(1.0, 0.1, 0.1);
         const Vector3f kd(0.8, 0.1, 0.1);
         const Vector3f ks(1.0, 1.0, 1.0);
         const float ke = 11.0;

@@ -7,8 +7,8 @@ using namespace Eigen;
 class Light
 {
 public:
-    Light(const Vector3f&, const Vector3f&);
-    Vector3f color, position;
+    Light(const Vector3f&, const Vector3f&, const Vector3f&);
+    Vector3f color, position, ambient;
 };
 
 #endif

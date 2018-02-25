@@ -2,10 +2,10 @@
 #include <cmath>
 #include "cylinder.h"
 
-Cylinder::Cylinder(const Vector3f& material, const Vector3f& center1, const Vector3f& center2, float radius):
-    Object(material),
+Cylinder::Cylinder(const Vector3f& center1, const Vector3f& center2, float radius, const IlluminationModel& model, const std::string& name):
     centers({center1, center2}),
-    radius(radius)
+    radius(radius),
+    Object(model, name)
 {
 }
 
@@ -64,3 +64,9 @@ float Cylinder::intersect(const Ray& ray) const
     }
     return -1;
 }
+
+// Vector3f Cylinder::getColor() const
+// {
+//     Vector3f color(0.5, 0.5, 0.0);
+//     return color;
+// }

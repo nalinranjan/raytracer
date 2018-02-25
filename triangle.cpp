@@ -2,9 +2,9 @@
 // #include <cmath>
 #include "triangle.h"
 
-Triangle::Triangle(const Vector3f& material, const Vector3f& v1, const Vector3f& v2, const Vector3f& v3):
-    Object(material),
-    vertices({v1, v2, v3})
+Triangle::Triangle(const Vector3f& v1, const Vector3f& v2, const Vector3f& v3, const IlluminationModel& model, const std::string& name):
+    vertices({v1, v2, v3}),
+    Object(model, name)
 {
 }
 
@@ -53,3 +53,15 @@ float Triangle::intersect(const Ray& ray) const
 
     return t;
 }
+
+Vector3f Triangle::getNormal(const Vector3f&) const
+{
+    Vector3f normal = (vertices[1]-vertices[0]).cross(vertices[2]-vertices[0]);
+    normal.normalize();
+    return normal;
+}
+// Vector3f Triangle::getColor() const
+// {
+//     Vector3f color(1.0, 0.0, 0.0);
+//     return color;
+// }

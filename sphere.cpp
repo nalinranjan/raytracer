@@ -2,10 +2,10 @@
 #include <cmath>
 #include "sphere.h"
 
-Sphere::Sphere(const Vector3f& material, const Vector3f& center, float radius):
-    Object(material),
+Sphere::Sphere(const Vector3f& center, float radius, const IlluminationModel& model, const std::string& name):
     center(center),
-    radius(radius)
+    radius(radius),
+    Object(model, name)
 {
 }
 
@@ -42,6 +42,25 @@ float Sphere::intersect(const Ray& ray) const
 
     return (-B + std::sqrt(D))/2;
 }
+
+Vector3f Sphere::getNormal(const Vector3f& intersection_pt) const
+{
+    Vector3f normal = intersection_pt - center;
+    normal.normalize();
+    return normal;
+}
+
+// Vector3f Sphere::getColor(const IntersectVectors& iv, const Light& light) const
+// {
+//     return model->getColor(iv, light);
+//     // Vector3f color(0.0, 1.0, 0.0);
+//     // return color;
+// }
+
+// Vector3f Sphere::getAmbient(const Light& light)
+// {
+//     return model->getAmbient(light);
+// }
 
 // Vector3f Sphere::getPos() const
 // {

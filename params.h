@@ -29,20 +29,37 @@ namespace params
     const float png_background = 0.7;
     const Vector3f img_background(0.2, 0.5, 0.8);
 
-    const int objects = 4;
-
     // Reflective Sphere
-    const Vector3f ref_color(0.8, 0.1, 0.1);
-    const Vector3f ref_center(-0.8, 1.3, 1.5);
-    const float ref_radius = 0.65;
+    namespace ref_sphere
+    {
+        const Vector3f center(-0.8, 1.3, 1.5);
+        const float radius = 0.65;
+        const Vector3f ka(1.0, 1.0, 1.0);
+        const Vector3f kd(0.8, 0.1, 0.1);
+        const Vector3f ks(1.0, 1.0, 1.0);
+        const float ke = 11.0;
+    }
 
     // Transmissive Sphere
-    const Vector3f trans_color(0.0, 0.0, 0.8);
-    const Vector3f trans_center(-1.9, 1.9, 2.0);
-    const float trans_radius = 0.8;
+    namespace trans_sphere
+    {
+        const Vector3f center(-1.9, 1.9, 2.0);
+        const float radius = 0.8;
+        const Vector3f ka(1.0, 1.0, 1.0);
+        const Vector3f kd(0.0, 0.0, 0.8);
+        const Vector3f ks(1.0, 1.0, 1.0);
+        const float ke = 9.0;
+    }
 
     // Floor
-    const Vector3f floor_color(0.93, 0.92, 0.23);
+    namespace floor_color
+    {
+        const Vector3f ka(1.0, 1.0, 1.0);
+        const Vector3f kd(0.93, 0.92, 0.23);
+        const Vector3f ks(0.4, 0.4, 0.4);
+        const float ke = 1.0;
+    }
+
     namespace floor1
     {
         const Vector3f v1(-4.2, 0.0, 9.0);
@@ -59,22 +76,22 @@ namespace params
     // Cylinder
     namespace cylinder
     {
-        const Vector3f color(0.0, 0.4, 0.03);
-        // const Vector3f center1(1.0, 0.0, -2.0);
-        // const Vector3f center2(1.0, 2.0, -2.0);
-        // const float radius = 0.7;
         const Vector3f center1(-1.8, 0.9, 3.4);
         const Vector3f center2(-1.8, 1.8, 3.4);
         const float radius = 0.3;
+        const Vector3f ka(1.0, 1.0, 1.0);
+        const Vector3f kd(0.0, 0.4, 0.0);
+        const Vector3f ks(1.0, 1.0, 1.0);
+        const float ke = 5.0;
     }
 
     namespace light1
     {
         const Vector3f color(1.0, 1.0, 1.0);
-        const Vector3f position(-1.3, 5.0, -5.0);
+        const Vector3f position(1.3, 5.0, 10.0);
+        const Vector3f ambient(0.2, 0.2, 0.25);
     }
 
-    const Vector3f ambient(0.8, 0.8, 1.0);
 }
 
 #endif

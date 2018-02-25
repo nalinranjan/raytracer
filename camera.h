@@ -11,6 +11,7 @@
 #include "object.h"
 // #include "color.h"
 #include "ray.h"
+#include "intersect.h"
 
 using namespace Eigen;
 
@@ -28,7 +29,12 @@ public:
     // void transformObjects(const World&) const;
     void transformObjects(const std::vector<Object *>& objects) const;
     // void illuminatePixel(int, int, float, float, const World&);
-    void illuminatePixel(int, int, float, float, const std::vector<Object *>& objects);
+    void illuminatePixel(int, int, float, float, const std::vector<Object *>&, const std::vector<Light *>&);
+    // void illuminatePixel(int, int, float, float, const std::vector<Object *>& objects);
+    bool inShadow(const Ray&, const std::vector<Object *>&) const;
+    IntersectVectors getIV(const Vector3f&, const Vector3f&, const Vector3f&) const;
+    Vector3f reflect(const Vector3f&, const Vector3f&) const; // Consider moving
+    void correctTone();
 
 private:
     Vector3f eyepoint, lookat, up;

@@ -1,9 +1,19 @@
 #include <iostream>
 #include "world.h"
 
-World::World(Vector3f ambient):
-    ambient(ambient)
+// World::World(Vector3f ambient):
+//     ambient(ambient)
+// {
+// }
+
+World::World() {}
+
+World::~World()
 {
+    for (Object* obj : objects)
+        delete obj;
+    for (Light* light : lights)
+        delete light;
 }
 
 void World::addObject(Object * obj)
@@ -35,7 +45,7 @@ std::vector<Light *> World::getLights() const
     return lights;
 }
 
-Vector3f World::getAmbientLight() const 
-{
-    return ambient;
-}
+// Vector3f World::getAmbientLight() const 
+// {
+//     return ambient;
+// }

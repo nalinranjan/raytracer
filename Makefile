@@ -41,3 +41,6 @@ world.o: world.cpp world.h
 
 camera.o: camera.cpp camera.h params.h
 	g++ -O3 -c camera.cpp -DNO_FREETYPE -I/home/nalin/Sourceballs/eigen-eigen-5a0156e40feb
+
+clean:
+	rm main *.o

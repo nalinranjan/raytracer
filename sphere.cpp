@@ -1,11 +1,10 @@
-// #include <iostream>
 #include <cmath>
 #include "sphere.h"
 
-Sphere::Sphere(const Vector3f& center, float radius, const IlluminationModel& model, const std::string& name):
+Sphere::Sphere(const Vector3f& center, float radius, const IlluminationModel& model, float kr, float kt, int max_depth, float ref_index, const std::string& name):
+    Object(model, kr, kt, max_depth, ref_index, name),
     center(center),
-    radius(radius),
-    Object(model, name)
+    radius(radius)
 {
 }
 
@@ -15,6 +14,13 @@ void Sphere::transform(const Matrix4f& view)
     h_center << center, 1.0;
     h_center = view * h_center;
     center = h_center.head(3);
+}
+
+void Sphere::makeAABB()
+{
+    aabb.set(center.x()-radius, center.x()+radius,
+             center.y()-radius, center.y()+radius,
+             center.z()-radius, center.z()+radius);
 }
 
 float Sphere::intersect(const Ray& ray) const
@@ -36,7 +42,7 @@ float Sphere::intersect(const Ray& ray) const
     }
 
     float w1 = (-B - std::sqrt(D))/2;
-    if (w1 > 0) {
+    if (w1 > 0.01) {
         return w1;
     }
 
@@ -50,17 +56,15 @@ Vector3f Sphere::getNormal(const Vector3f& intersection_pt) const
     return normal;
 }
 
-// Vector3f Sphere::getColor(const IntersectVectors& iv, const Light& light) const
-// {
-//     return model->getColor(iv, light);
-//     // Vector3f color(0.0, 1.0, 0.0);
-//     // return color;
-// }
+Vector3f Sphere::getColor(const Vector3f& intersection_pt, const Light& light, const Vector3f& eyepoint) const
+{
+    return material->getColor(getIV(intersection_pt, light.position, eyepoint), light);
+}
 
-// Vector3f Sphere::getAmbient(const Light& light)
-// {
-//     return model->getAmbient(light);
-// }
+Vector3f Sphere::getAmbient(const Vector3f& intersection_pt, const Light& light) const
+{
+    return material->getAmbient(light);
+}
 
 Vector3f Sphere::getPos() const
 {

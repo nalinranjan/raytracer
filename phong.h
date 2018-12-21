@@ -11,8 +11,8 @@ class Phong : public IlluminationModel
 {
 public:
     Phong(const Vector3f&, const Vector3f&, const Vector3f&, float);
-    Vector3f getColor(const IntersectVectors&, const Light&) const;
-    Vector3f getAmbient(const Light&) const;
+    Vector3f getColor(const IntersectVectors&, const Light&, const Vector3f& = {}) const;
+    Vector3f getAmbient(const Light&, const Vector3f& = {}) const;
 
 private:
     Vector3f ka, kd, ks;

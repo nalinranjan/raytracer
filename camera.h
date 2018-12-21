@@ -4,14 +4,15 @@
 #include <limits>
 #include <array>
 #include <vector>
+#include <thread>
 #include <Eigen/Dense>
 #include <pngwriter.h>
 #include "params.h"
 #include "world.h"
 #include "object.h"
-// #include "color.h"
 #include "ray.h"
 #include "intersect.h"
+#include "ctpl_stl.h"
 
 using namespace Eigen;
 
@@ -26,21 +27,17 @@ public:
     void calculateTransform();
     void printTransform();
     void render(const World&);
-    // void transformObjects(const World&) const;
     void transformObjects(const std::vector<Object *>& objects) const;
     void transformLights(const std::vector<Light *>& lights) const;
-    // void illuminatePixel(int, int, float, float, const World&);
-    void illuminatePixel(int, int, float, float, const std::vector<Object *>&, const std::vector<Light *>&);
-    // void illuminatePixel(int, int, float, float, const std::vector<Object *>& objects);
-    bool inShadow(const Ray&, const std::vector<Object *>&) const;
-    IntersectVectors getIV(const Vector3f&, const Vector3f&, const Vector3f&) const;
-    Vector3f reflect(const Vector3f&, const Vector3f&) const; // Consider moving
-    void correctTone();
+    Vector3f illuminatePixel(int, int, int, float, float, const World&, const std::vector<Light *>&);
+    Vector3f traceRay(const Ray&, int, const World&, const std::vector<Light *>&, float);
+    float inShadow(const Ray&, const World&) const;
+    static float getRandom();
+    static float vignette(const Vector3f&);
 
 private:
     Vector3f eyepoint, lookat, up;
     Matrix4f viewTransform;
-    std::vector<std::vector<Vector3f>> screenBuffer;
 };
 
 #endif

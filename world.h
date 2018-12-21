@@ -6,25 +6,36 @@
 #include <Eigen/Dense>
 #include "object.h"
 #include "light.h"
+#include "aabb.h"
+#include "illumination.h"
+#include "kdnode.h"
+#include "ray.h"
+#include "params.h"
 using namespace Eigen;
 
 class World
 {
 public:
-    // World(Vector3f);
     World();
     ~World();
     void addObject(Object *);
     void addLight(Light *);
+    void addModel();
     std::vector<Object *> getObjects() const;
     std::vector<Light *> getLights() const;
-    void printColors() const;
-    // Vector3f getAmbientLight() const;
+    std::vector<Object *> getHitObjects(const Ray&) const;
+    void makeAABB();
+    void buildKdTree();
+    void print() const;
+    void printKd() const;
+    void sort();
 
 private:
     std::vector<Object *> objects;
     std::vector<Light *> lights;
-    // Vector3f ambient;
+    AABB aabb;
+    KdNode * kdRoot;
+    IlluminationModel * defaultIllumination;
 };
 
 #endif

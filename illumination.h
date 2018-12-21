@@ -10,8 +10,9 @@ class IlluminationModel
 {
 public:
     IlluminationModel();
-    virtual Vector3f getColor(const IntersectVectors&, const Light&) const = 0;
-    virtual Vector3f getAmbient(const Light&) const = 0;
+    virtual ~IlluminationModel();
+    virtual Vector3f getColor(const IntersectVectors&, const Light&, const Vector3f& = {}) const = 0;
+    virtual Vector3f getAmbient(const Light&, const Vector3f& = {}) const = 0;
 };
 
 #endif

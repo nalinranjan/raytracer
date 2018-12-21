@@ -6,7 +6,7 @@ Phong::Phong(const Vector3f& ka, const Vector3f& kd, const Vector3f& ks, float k
 {
 }
 
-Vector3f Phong::getColor(const IntersectVectors& intersect, const Light& light) const
+Vector3f Phong::getColor(const IntersectVectors& intersect, const Light& light, const Vector3f& texInfo) const
 {
     Vector3f color = getAmbient(light);
     color += intersect.S.dot(intersect.N) * kd.cwiseProduct(light.color);
@@ -14,7 +14,7 @@ Vector3f Phong::getColor(const IntersectVectors& intersect, const Light& light) 
     return color;
 }
 
-Vector3f Phong::getAmbient(const Light& light) const
+Vector3f Phong::getAmbient(const Light& light, const Vector3f& texInfo) const
 {
     return light.ambient.cwiseProduct(ka);
 }

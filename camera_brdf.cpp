@@ -1,15 +1,13 @@
 #include <iostream>
 #include <chrono>
 #include <random>
-#include <utility>
 #include <cmath>
+#include <utility>
 #include "camera.h"
-#include "tone_ward.h"
-#include "tone_reinhard.h"
-#include "tone_adaptive_log.h"
 
 Camera::Camera():
-    eyepoint(params::eyepoint), lookat(params::lookat), up(params::up)
+    eyepoint(params::eyepoint), lookat(params::lookat), up(params::up),
+    screenBuffer(params::img_height * params::img_width)
 {
     calculateTransform();
 }
@@ -69,7 +67,6 @@ void Camera::render(const World& world)
 
     ctpl::thread_pool pool(params::threads);
     using namespace std::placeholders;
-    std::vector<std::future<Vector3f>> screenBuffer(params::img_height * params::img_width); 
 
     auto start = std::chrono::high_resolution_clock::now();
     
@@ -86,9 +83,18 @@ void Camera::render(const World& world)
 
     pool.stop(true);
 
-    // tone_rep::render_ward(screenBuffer);
-    // tone_rep::render_reinhard(screenBuffer);
-    tone_rep::render_adaptive_log(screenBuffer);
+    pngwriter png(params::img_width, params::img_height, params::png_background, "out.png");
+
+    for(int i = 1; i <= params::img_width; i++)
+    {
+        for (int j = 1; j <= params::img_height; j++)
+        {
+            Vector3f color = screenBuffer[(i-1)*params::img_height + (j-1)].get();
+            png.plot(i, j, color.x(),color.y(), color.z());
+        }
+    }
+
+    png.close();
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = end - start;
@@ -147,22 +153,14 @@ Vector3f Camera::illuminatePixel(int id, int i, int j, float pixel_width, float 
 
         Ray ray(Vector3f::Zero(), direction);
 
-        c += traceRay(ray, 0, world, lights, params::outside_ref_index);
+        c += traceRay(ray, 0, world, lights);
     }
 
     c /= params::supersample;
-
-    // Vector3f direction(-1*params::view_width/2 + (i-0.5)*pixel_width,
-    //                    -1*params::view_height/2 + (j-0.5)*pixel_height,
-    //                    -params::f);
-    // direction.normalize();
-
-    // c *= vignette(direction);
-
     return c;
 }
 
-Vector3f Camera::traceRay(const Ray& ray, int depth, const World& world, const std::vector<Light *>& lights, float ref_index)
+Vector3f Camera::traceRay(const Ray& ray, int depth, const World& world, const std::vector<Light *>& lights)
 {
     Vector3f color = Vector3f::Zero();
     auto objects = world.getHitObjects(ray);
@@ -203,43 +201,59 @@ Vector3f Camera::traceRay(const Ray& ray, int depth, const World& world, const s
         {
             Vector3f light_direction = light->position - intersection_pt;
             light_direction.normalize();
-
-            float shadow_intensity = inShadow(Ray(intersection_pt, light_direction), world);
-            color += hit_object->getAmbient(intersection_pt, *light);
-            
-            color += shadow_intensity * hit_object->getColor(intersection_pt, *light, eyepoint);
+            if (inShadow(Ray(intersection_pt, light_direction), world))
+            {
+                color += hit_object->getAmbient(intersection_pt, *light);
+            }
+            else
+            {
+                color += hit_object->getColor(intersection_pt, *light, eyepoint);
+            }
 
             if (depth < hit_object->getMaxDepth())
             {
-                if (hit_object->getkr() > 0)
+                if (hit_object->getkr() > 0) 
                 {
-                    Ray reflected_ray(intersection_pt, Object::reflect(ray.direction, hit_object->getNormal(intersection_pt)));
-                    color += hit_object->getkr() * traceRay(reflected_ray, depth+1, world, lights, ref_index);
-                }
+                    Vector3f c = Vector3f::Zero();
 
-                if (hit_object->getkt() > 0)
-                {
-                    float obj_ref_index = hit_object->getRefIndex();
-                    float ref_index2 = (obj_ref_index  == ref_index)? params::outside_ref_index : obj_ref_index;
-                    auto dir_tir = Object::transmit(ray.direction, hit_object->getNormal(intersection_pt), ref_index, ref_index2);
-                    Ray transmitted_ray(intersection_pt, dir_tir.first);
-                    color += hit_object->getkt() * traceRay(transmitted_ray, depth+1, world, lights, (dir_tir.second)? ref_index : ref_index2);
+                    for (int i = 0; i < params::reflection_rays; ++i)
+                    {
+                        float u = getRandom();
+                        float kd = hit_object->getKdMagnitude(), ks = hit_object->getKsMagnitude();
+                        if (u < kd)
+                        {
+                            Ray reflected_ray(intersection_pt, sampleDiffuse(hit_object->getNormal(intersection_pt)));
+                            c += hit_object->scaleDiffuse(traceRay(reflected_ray, depth+1, world, lights));
+                        }
+                        else if (u < (kd + ks))
+                        {
+                            float ke = hit_object->getke();
+                            auto dir_alpha = sampleSpecular(Object::reflect(ray.direction, hit_object->getNormal(intersection_pt)), ke);
+                            Ray reflected_ray(intersection_pt, dir_alpha.first);
+                            c += std::pow(std::cos(dir_alpha.second), ke) * hit_object->scaleSpecular(traceRay(reflected_ray, depth+1, world, lights));
+                        }
+                        else
+                        {
+                            Ray reflected_ray(intersection_pt, Object::reflect(ray.direction, hit_object->getNormal(intersection_pt)));
+                            c += hit_object->getkr() * traceRay(reflected_ray, depth+1, world, lights);
+                        }
+                    }
+                    
+                    c /= params::reflection_rays;
+                    color += c;
                 }
             }
         }
     }
     else
     {
-        for (auto& light : lights)
-        {
-            color += (light->color).cwiseProduct(params::img_background);
-        }
+        color += params::img_background;
     }
 
     return color;
 }
 
-float Camera::inShadow(const Ray& shadow_ray, const World& world) const
+bool Camera::inShadow(const Ray& shadow_ray, const World& world) const
 {
     auto objects = world.getHitObjects(shadow_ray);
     for (auto& obj : objects)
@@ -250,10 +264,10 @@ float Camera::inShadow(const Ray& shadow_ray, const World& world) const
         }
         if (obj->intersect(shadow_ray) > 0.04)
         {
-            return obj->getkt();
+            return true;
         }
     }
-    return 1.0;
+    return false;
 }
 
 float Camera::getRandom()
@@ -263,10 +277,42 @@ float Camera::getRandom()
     return rand(e);
 }
 
-float Camera::vignette(const Vector3f& direction)
+Vector3f Camera::sampleDiffuse(const Vector3f& normal) const
 {
-    static Vector3f toCenter(0.0, 0.0, -1.0);
-    static float multiplier = M_PI / (4 * params::f_stop * params::f_stop);
+    float u1 = getRandom(), u2 = getRandom();
+    float theta = std::acos(std::sqrt(u1));
+    float phi = 2 * M_PI * u2;
 
-    return multiplier * std::pow(direction.dot(toCenter), 4.0);
+    Vector3f x(normal.y(), -normal.x(), 0);
+    x.normalize();
+    Vector3f y = normal.cross(x);
+
+    float sin_theta = std::sin(theta);
+    float cos_theta = std::cos(theta);
+    float sin_phi = std::sin(phi);
+    float cos_phi = std::cos(phi);
+
+    Vector3f direction = sin_theta*cos_phi*x + sin_theta*sin_phi*y + cos_theta*normal;
+    direction.normalize();
+    return direction;
+}
+
+std::pair<Vector3f, float> Camera::sampleSpecular(const Vector3f& reflected, float ke) const
+{
+    float u1 = getRandom(), u2 = getRandom();
+    float alpha = std::acos(std::pow(u1, 1.0 / (ke + 1)));
+    float phi = 2 * M_PI * u2;
+
+    Vector3f x(reflected.y(), -reflected.x(), 0);
+    x.normalize();
+    Vector3f y = reflected.cross(x);
+
+    float sin_alpha = std::sin(alpha);
+    float cos_alpha = std::cos(alpha);
+    float sin_phi = std::sin(phi);
+    float cos_phi = std::cos(phi);
+
+    Vector3f direction = sin_alpha*cos_phi*x + sin_alpha*sin_phi*y + cos_alpha*reflected;
+    direction.normalize();
+    return std::make_pair(direction, alpha);
 }

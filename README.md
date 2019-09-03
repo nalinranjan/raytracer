@@ -21,3 +21,15 @@ Run the ray tracer with:
 ```
 ./main
 ```
+
+## Renders
+
+![Whitted Ray Tracing](renders/whitted_ward.jpg)
+
+![Bunny](renders/bunny.jpg)
+
+![Dragon](renders/dragon.jpg)
+
+![Glossy material with importance sampling](renders/glossy.jpg)
+
+![Procedurally generated texture](renders/procedural_texture.jpg)
